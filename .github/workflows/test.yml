@@ -1,0 +1,24 @@
+name: Test Installer
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  windows-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          echo "No additional dependencies required for now"
+
+      - name: Test Executable
+        run: |
+          .\osdag_script.exe
