@@ -112,7 +112,7 @@ def install_miniconda():
 
         # Install Miniconda silently
         try:
-            subprocess.run([installer_path, "/S", f"/D={os.path.expanduser('~\\Miniconda3')}"], check=True)
+            subprocess.run([installer_path, "/S", f"/D={os.path.expanduser('~\\\\Miniconda3')}"], check=True)
             print("Miniconda installed successfully.")
         except subprocess.CalledProcessError as e:
             print(f"Failed to install Miniconda: {e}")
