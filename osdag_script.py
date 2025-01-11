@@ -67,7 +67,6 @@
 #     setup_conda_env()
 #     launch_osdag()
 
-
 import os
 import subprocess
 import sys
@@ -113,17 +112,28 @@ def install_miniconda():
             with open(installer_path, 'wb') as file:
                 file.write(response.content)
 
+            # Verify the installer file exists
+            if not os.path.exists(installer_path):
+                raise FileNotFoundError(f"Installer not found at {installer_path}")
+
             # Install Miniconda silently
             print("Installing Miniconda silently...")
             subprocess.run([installer_path, "/S", "/D=" + os.path.expanduser("~") + "\\Miniconda3"], check=True)
 
             # Verify installation
             print("Verifying Miniconda installation...")
-            subprocess.run([os.path.expanduser("~\\Miniconda3\\Scripts\\conda.exe"), "--version"], check=True)
+            conda_exe = os.path.expanduser("~\\Miniconda3\\Scripts\\conda.exe")
+            if not os.path.exists(conda_exe):
+                raise FileNotFoundError(f"Conda executable not found at {conda_exe}")
+
+            subprocess.run([conda_exe, "--version"], check=True)
             print("Miniconda installed successfully.")
 
         except requests.RequestException as e:
             print(f"Failed to download Miniconda: {e}")
+            sys.exit(1)
+        except FileNotFoundError as e:
+            print(f"File not found: {e}")
             sys.exit(1)
         except subprocess.CalledProcessError as e:
             print(f"Failed to install Miniconda: {e}")
