@@ -104,6 +104,12 @@ def install_miniconda():
             response = requests.get(miniconda_url)
             with open(installer_path, 'wb') as f:
                 f.write(response.content)
+            print(f"Miniconda installer saved to: {installer_path}")
+            
+            # Check if the installer exists
+            if not os.path.exists(installer_path):
+                print(f"Error: Installer not found at {installer_path}")
+                sys.exit(1)
 
             # Install Miniconda silently
             subprocess.run([installer_path, "/S", "/D=" + os.path.expanduser("~\\Miniconda3")], check=True)
