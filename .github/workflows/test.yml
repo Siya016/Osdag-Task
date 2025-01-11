@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   windows-test:
@@ -15,10 +12,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: |
-          echo "No additional dependencies required for now"
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'  # Specify your Python version
 
-      - name: Test Executable
-        run: |
-          .\osdag_script.exe
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build Executable
+        run: pyinstaller --onefile osdag_script.py
+
+      - name: List Files in Dist Directory
+        run: dir dist
+
+      - name: Run the Executable
+        run: .\dist\osdag_script.exe
