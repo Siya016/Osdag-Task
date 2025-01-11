@@ -115,7 +115,7 @@ def install_miniconda():
 
             # Install Miniconda silently
             print("Installing Miniconda silently...")
-            subprocess.run([installer_path, "/S", "/D=" + os.path.expanduser("~\\Miniconda3")], check=True)
+            subprocess.run([installer_path, "/S", "/D=" + os.path.expanduser("~") + "\\Miniconda3"], check=True)
 
             # Verify installation
             print("Verifying Miniconda installation...")
