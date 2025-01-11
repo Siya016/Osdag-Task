@@ -31,5 +31,14 @@ jobs:
       - name: List Files in Dist Directory
         run: dir dist
 
+      - name: Check system info
+        run: |
+          systeminfo
+          echo "Current directory: $(pwd)"
+
       - name: Run the Executable
-        run: .\dist\osdag_script.exe
+        run: |
+          echo "Running the executable..."
+          $exePath = "${GITHUB_WORKSPACE}\\dist\\osdag_script.exe"
+          Write-Host "Executable path: $exePath"
+          & $exePath
