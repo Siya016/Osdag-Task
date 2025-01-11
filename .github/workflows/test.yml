@@ -38,7 +38,6 @@ jobs:
 
       - name: Run the Executable
         run: |
-          echo "Running the executable..."
-          $exePath = "${GITHUB_WORKSPACE}\\dist\\osdag_script.exe"
-          Write-Host "Executable path: $exePath"
-          & $exePath
+          Set-Location -Path "D:\a\Osdag-Task\Osdag-Task"
+          dir .\dist
+          & ".\dist\osdag_script.exe"
