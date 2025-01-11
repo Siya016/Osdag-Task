@@ -94,19 +94,31 @@ def check_conda_version():
 def install_miniconda():
     """Install Miniconda if not present."""
     try:
+        print("Checking if Miniconda is installed...")
         check_conda_version()  # Check Conda version
     except FileNotFoundError:
+        print("Miniconda not found. Proceeding with installation...")
         miniconda_url = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe"
         installer_path = os.path.join(os.getcwd(), "Miniconda3-latest-Windows-x86_64.exe")
+        print(f"Installer will be downloaded to: {installer_path}")
 
         # Download Miniconda installer
         try:
-            subprocess.run(["curl", "-o", installer_path, miniconda_url], check=True)
-            # Install Miniconda silently
-            subprocess.run([installer_path, "/S", "/D=" + os.path.expanduser("~\\Miniconda3")], check=True)
+            result = subprocess.run(["curl", "-o", installer_path, miniconda_url], check=True)
+            print("Download completed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to download Miniconda: {e}")
+            sys.exit(1)
+
+        # Install Miniconda silently
+        try:
+            subprocess.run([installer_path, "/S", f"/D={os.path.expanduser('~\\Miniconda3')}"], check=True)
             print("Miniconda installed successfully.")
         except subprocess.CalledProcessError as e:
-            print(f"Failed to download or install Miniconda: {e}")
+            print(f"Failed to install Miniconda: {e}")
+            sys.exit(1)
+        except FileNotFoundError as e:
+            print(f"Installer file not found: {installer_path}. Error: {e}")
             sys.exit(1)
 
 
