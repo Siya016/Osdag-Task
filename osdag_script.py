@@ -233,8 +233,7 @@ def configure_conda_path():
 
 
 
-import subprocess
-import sys
+
 
 def setup_conda_env():
     """Set up the Conda environment with Osdag installation."""
