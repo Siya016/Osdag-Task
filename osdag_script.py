@@ -249,7 +249,7 @@ def setup_conda_env():
             raise Exception("Conda installation of 'osdag' failed.")
     except Exception as conda_error:
         print(f"Conda installation of 'osdag' failed: {conda_error}")
-        sys.exit(1) modify this
+        sys.exit(1) 
 
 
 def install_latex_packages():
