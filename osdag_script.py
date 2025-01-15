@@ -382,6 +382,19 @@ def configure_conda_path():
         print("Conda added to PATH.")
 
 
+def initialize_conda():
+    """Initialize Conda for the current shell."""
+    try:
+        print("Initializing Conda for the shell...")
+        subprocess.run(["conda", "init"], check=True, shell=True)
+        print("Conda initialized successfully. Please restart your terminal or run the script again.")
+        sys.exit(0)  # Exit to allow the user to restart the shell
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to initialize Conda: {e}")
+        sys.exit(1)
+
+
+
 def setup_conda_env():
     """Set up the Conda environment with Osdag installation."""
     env_name = "osdag-env"
@@ -412,12 +425,22 @@ def install_latex_packages():
         "hyperref"
     ]
     try:
-        print("Installing LaTeX packages using MiKTeX...")
-        subprocess.run(["miktex-console", "--install"] + latex_packages, check=True)
-        print("LaTeX packages installed successfully!")
-    except subprocess.CalledProcessError:
-        print("Failed to install LaTeX packages. Please ensure MiKTeX is installed and accessible in your PATH.")
+        print("Checking for LaTeX package manager...")
+        result = subprocess.run(
+            ["miktex-console", "--install", "--yes"] + latex_packages,
+            check=True
+        )
+        if result.returncode == 0:
+            print("LaTeX packages installed successfully!")
+        else:
+            print("LaTeX package installation completed with warnings.")
+    except FileNotFoundError:
+        print("LaTeX package manager (MiKTeX/TeX Live) not found. Please ensure it is installed and added to your PATH.")
         sys.exit(1)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to install LaTeX packages: {e}")
+        sys.exit(1)
+
 
 
 def launch_osdag():
@@ -438,6 +461,9 @@ if __name__ == "__main__":
                 configure_conda_path()
                 print("Verifying Miniconda installation...")
                 subprocess.run(["conda", "--version"], check=True)
+
+         # Ensure Conda is initialized before proceeding
+        initialize_conda()
 
         setup_conda_env()
         install_latex_packages()
