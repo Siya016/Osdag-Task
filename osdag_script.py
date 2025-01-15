@@ -233,23 +233,41 @@ def configure_conda_path():
 
 
 
+import subprocess
+import sys
+
 def setup_conda_env():
     """Set up the Conda environment with Osdag installation."""
     env_name = "osdag-env"
     try:
-        print(f"Creating Conda environment '{env_name}' with Python 3.8...")
-        subprocess.run(["conda", "create", "-n", env_name, "python=3.8", "-y"], check=True)
-        print(f"Conda environment '{env_name}' created successfully.")
+        # Step 1: Create Conda environment with Osdag installed directly
+        print(f"Creating Conda environment '{env_name}' with 'osdag' pre-installed...")
+        subprocess.run(["conda", "create", "-n", env_name, "osdag::osdag", "-c", "conda-forge", "-y"], check=True)
+        print(f"Conda environment '{env_name}' created successfully with 'osdag' installed.")
         
-        print(f"Installing 'osdag' via Conda in '{env_name}'...")
-        result = subprocess.run(["conda", "install", "-n", env_name, "osdag", "-c", "conda-forge", "-y"], check=True)
-        if result.returncode == 0:
-            print(f"'osdag' installed successfully in Conda environment '{env_name}'.")
+        # Step 2: Activate the Conda environment
+        print(f"Activating Conda environment '{env_name}'...")
+        activation_command = f"conda activate {env_name}"
+        subprocess.run(activation_command, shell=True, check=True)
+        print(f"Conda environment '{env_name}' activated successfully.")
+        
+        # Optional: Verify 'osdag' installation
+        print("Verifying 'osdag' installation...")
+        result = subprocess.run(["conda", "list", "-n", env_name], check=True, text=True, capture_output=True)
+        if "osdag" in result.stdout:
+            print("'osdag' is installed successfully in the environment.")
         else:
-            raise Exception("Conda installation of 'osdag' failed.")
-    except Exception as conda_error:
-        print(f"Conda installation of 'osdag' failed: {conda_error}")
-        sys.exit(1) 
+            raise Exception("'osdag' does not appear to be installed.")
+    except subprocess.CalledProcessError as process_error:
+        print(f"Error during setup process: {process_error}")
+        sys.exit(1)
+    except Exception as general_error:
+        print(f"An unexpected error occurred: {general_error}")
+        sys.exit(1)
+
+# Call the function to set up the environment
+setup_conda_env()
+
 
 
 def install_latex_packages():
