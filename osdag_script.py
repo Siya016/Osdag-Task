@@ -231,23 +231,46 @@ def configure_conda_path():
         print("Conda added to PATH.")
 
 
+
+
 def setup_conda_env():
     """Set up the Conda environment with Osdag installation."""
     env_name = "osdag-env"
+    
     try:
+        # Step 1: Create a new Conda environment with Python 3.8
         print(f"Creating Conda environment '{env_name}' with Python 3.8...")
         subprocess.run(["conda", "create", "-n", env_name, "python=3.8", "-y"], check=True)
         print(f"Conda environment '{env_name}' created successfully.")
         
+        # Step 2: Activate the Conda environment
+        print(f"Activating Conda environment '{env_name}'...")
+        subprocess.run(f"conda activate {env_name}", shell=True, check=True)
+        
+        # Step 3: Install 'osdag' via Conda in the created environment
         print(f"Installing 'osdag' via Conda in '{env_name}'...")
         result = subprocess.run(["conda", "install", "-n", env_name, "osdag", "-c", "conda-forge", "-y"], check=True)
         if result.returncode == 0:
             print(f"'osdag' installed successfully in Conda environment '{env_name}'.")
         else:
             raise Exception("Conda installation of 'osdag' failed.")
-    except Exception as conda_error:
-        print(f"Conda installation of 'osdag' failed: {conda_error}")
+        
+        # Step 4: Run Osdag after installation
+        print(f"Running 'osdag' in the environment '{env_name}'...")
+        subprocess.run("osdag", shell=True, check=True)
+        
+        print(f"Osdag has been successfully installed and launched in '{env_name}'.")
+    
+    except subprocess.CalledProcessError as conda_error:
+        print(f"Error during the installation process: {conda_error}")
         sys.exit(1)
+    except Exception as error:
+        print(f"An unexpected error occurred: {error}")
+        sys.exit(1)
+
+# Call the function to set up and run Osdag
+setup_conda_env()
+
 
 
 
