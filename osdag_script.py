@@ -383,32 +383,32 @@ def configure_conda_path():
         print("Conda added to PATH.")
 
 
-def initialize_conda():
-    """Initialize Conda for the current shell."""
-    try:
-        print("Initializing Conda for the shell...")
-        subprocess.run(["conda", "init"], check=True, shell=True)
-        print("Conda initialized successfully. Please restart your terminal or run the script again.")
-        sys.exit(0)  # Exit to allow the user to restart the shell
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to initialize Conda: {e}")
-        sys.exit(1)
-
 # def initialize_conda():
-#     """Initialize Conda for shell."""
+#     """Initialize Conda for the current shell."""
 #     try:
 #         print("Initializing Conda for the shell...")
-#         subprocess.run(["conda", "init"], check=True)
-#         print("Conda initialized successfully.")
-        
-#         # Restart the script to apply the changes made by `conda init`
-#         print("Restarting the script to apply changes...")
-#         time.sleep(2)  # Give the user a brief moment before restart
-#         os.execv(sys.executable, ['python'] + sys.argv)  # Restart the script
-        
+#         subprocess.run(["conda", "init"], check=True, shell=True)
+#         print("Conda initialized successfully. Please restart your terminal or run the script again.")
+#         sys.exit(0)  # Exit to allow the user to restart the shell
 #     except subprocess.CalledProcessError as e:
 #         print(f"Failed to initialize Conda: {e}")
 #         sys.exit(1)
+
+def initialize_conda():
+    """Initialize Conda for shell."""
+    try:
+        print("Initializing Conda for the shell...")
+        subprocess.run(["conda", "init"], check=True)
+        print("Conda initialized successfully.")
+        
+        # Restart the script to apply the changes made by `conda init`
+        print("Restarting the script to apply changes...")
+        time.sleep(2)  # Give the user a brief moment before restart
+        os.execv(sys.executable, ['python'] + sys.argv)  # Restart the script
+        
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to initialize Conda: {e}")
+        sys.exit(1)
 
 
 
