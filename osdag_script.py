@@ -394,21 +394,64 @@ def configure_conda_path():
 #         print(f"Failed to initialize Conda: {e}")
 #         sys.exit(1)
 
-def initialize_conda():
-    """Initialize Conda for shell."""
-    try:
-        print("Initializing Conda for the shell...")
-        subprocess.run(["conda", "init"], check=True)
-        print("Conda initialized successfully.")
+# def initialize_conda():
+#     """Initialize Conda for shell."""
+#     try:
+#         print("Initializing Conda for the shell...")
+#         subprocess.run(["conda", "init"], check=True)
+#         print("Conda initialized successfully.")
         
-        # Restart the script to apply the changes made by `conda init`
-        print("Restarting the script to apply changes...")
-        time.sleep(2)  # Give the user a brief moment before restart
+#         # Restart the script to apply the changes made by `conda init`
+#         print("Restarting the script to apply changes...")
+#         time.sleep(2)  # Give the user a brief moment before restart
+#         os.execv(sys.executable, ['python'] + sys.argv)  # Restart the script
+        
+#     except subprocess.CalledProcessError as e:
+#         print(f"Failed to initialize Conda: {e}")
+#         sys.exit(1)
+
+def initialize_conda(required_version="4.10.0"):
+
+try:
+        print("Checking if Conda is installed...")
+        # Check if Conda is available
+        conda_path = shutil.which("conda")
+        if not conda_path:
+            print("Conda not found in PATH. Please ensure Miniconda is installed.")
+            sys.exit(1)
+        
+        # Check Conda version
+        result = subprocess.run(["conda", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if result.returncode != 0:
+            print(f"Error checking Conda version: {result.stderr.strip()}")
+            sys.exit(1)
+        
+        current_version = result.stdout.strip().split()[-1]
+        print(f"Current Conda version: {current_version}")
+        
+        # Compare versions
+        if tuple(map(int, current_version.split("."))) < tuple(map(int, required_version.split("."))):
+            print(f"Your Conda version ({current_version}) is lower than the required version ({required_version}). Please update Conda.")
+            sys.exit(1)
+        
+        print("Initializing Conda for the shell...")
+        # Run `conda init` if not already initialized
+        init_result = subprocess.run(["conda", "init"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if init_result.returncode != 0:
+            print(f"Error initializing Conda: {init_result.stderr.strip()}")
+            sys.exit(1)
+        
+        print("Conda initialized successfully. Restarting the script to apply changes...")
+        time.sleep(2)  # Pause before restarting
         os.execv(sys.executable, ['python'] + sys.argv)  # Restart the script
         
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to initialize Conda: {e}")
+    except FileNotFoundError as e:
+        print(f"Error: {e}. Ensure that Conda is correctly installed and available in PATH.")
         sys.exit(1)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        sys.exit(1)
+
 
 
 
