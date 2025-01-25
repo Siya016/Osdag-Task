@@ -424,7 +424,7 @@ def configure_conda_path():
 def initialize_conda(required_version="4.10.0"):
 
     try:
-            print("Checking if Conda is installed...")
+        print("Checking if Conda is installed...")
         # Check if Conda is available
         conda_path = shutil.which("conda")
         if not conda_path:
