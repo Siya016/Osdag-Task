@@ -320,6 +320,16 @@ import time
 import shutil
 
 
+def parse_version(version_str):
+    """Safely parse version strings into comparable tuples."""
+    try:
+        return tuple(map(int, version_str.split(".")))
+    except ValueError:
+        # Handle non-standard version formats (e.g., 24.11.1)
+        return tuple(int(part) if part.isdigit() else 0 for part in version_str.split("."))
+
+
+
 def check_conda_version():
     """Check if Miniconda is installed and meets the version requirement."""
     required_version = "4.10.0"
@@ -414,7 +424,7 @@ def configure_conda_path():
 def initialize_conda(required_version="4.10.0"):
 
     try:
-        print("Checking if Conda is installed...")
+            print("Checking if Conda is installed...")
         # Check if Conda is available
         conda_path = shutil.which("conda")
         if not conda_path:
@@ -430,8 +440,8 @@ def initialize_conda(required_version="4.10.0"):
         current_version = result.stdout.strip().split()[-1]
         print(f"Current Conda version: {current_version}")
         
-        # Compare versions
-        if tuple(map(int, current_version.split("."))) < tuple(map(int, required_version.split("."))):
+        # Compare versions using a safe parsing method
+        if parse_version(current_version) < parse_version(required_version):
             print(f"Your Conda version ({current_version}) is lower than the required version ({required_version}). Please update Conda.")
             sys.exit(1)
         
@@ -447,11 +457,14 @@ def initialize_conda(required_version="4.10.0"):
         os.execv(sys.executable, ['python'] + sys.argv)  # Restart the script
         
     except FileNotFoundError as e:
-        print(f"Error: {e}. Ensure that Conda is correctly installed and available in PATH.")
+        print(f"Error: {e}. Ensure that the required files are present and try again.")
+        if "base_library.zip" in str(e):
+            print("It seems you're running this script in a packaged environment. Ensure all dependencies are bundled correctly.")
         sys.exit(1)
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         sys.exit(1)
+        
 
 
 
