@@ -735,7 +735,7 @@ def find_conda():
                 return path
     
     if not conda_exe:
-        print("❌ Conda is not installed. Please install Miniconda first.")
+        print("X Conda is not installed. Please install Miniconda first.")  # Changed ❌ to X
         sys.exit(1)
     
     return conda_exe
