@@ -677,84 +677,38 @@
 import os
 import subprocess
 import sys
-import time
 import shutil
 
-def run_command(command):
-    """Run a shell command and return its output."""
-    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+CONDA_PATH = shutil.which("conda")
+ENV_NAME = "osdag-env"
+
+def run_command(command, shell=True):
+    """Run a shell command and exit if it fails."""
+    result = subprocess.run(command, shell=shell, text=True, capture_output=True)
     if result.returncode != 0:
         print(f"Error: {result.stderr}")
         sys.exit(1)
     return result.stdout.strip()
 
-def check_conda():
-    """Check if Conda is installed and available in PATH."""
-    try:
-        conda_version = run_command("conda --version")
-        print(f"✅ Conda detected: {conda_version}")
-        return True
-    except FileNotFoundError:
-        print("❌ Conda not found. Installing Miniconda...")
-        return False
-
-def install_miniconda():
-    """Download and install Miniconda silently."""
-    miniconda_url = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe"
-    installer_path = os.path.join(os.getcwd(), "Miniconda3.exe")
-
-    # Download Miniconda installer
-    try:
-        import requests
-    except ImportError:
-        subprocess.run([sys.executable, "-m", "pip", "install", "requests"], check=True)
-        import requests
-    
-    print(f"📥 Downloading Miniconda from {miniconda_url}...")
-    response = requests.get(miniconda_url, stream=True)
-    if response.status_code == 200:
-        with open(installer_path, "wb") as file:
-            for chunk in response.iter_content(1024):
-                file.write(chunk)
-        print("✅ Miniconda downloaded.")
-    else:
-        print(f"❌ Failed to download Miniconda. HTTP Status: {response.status_code}")
-        sys.exit(1)
-
-    # Install Miniconda silently
-    install_dir = os.path.expanduser("~\\Miniconda3")
-    print(f"⚙️ Installing Miniconda at {install_dir}...")
-    subprocess.run([installer_path, "/S", f"/D={install_dir}"], check=True)
-    print("✅ Miniconda installation completed.")
-
 def setup_conda_env():
-    """Set up the Conda environment and install Osdag."""
-    env_name = "osdag_env"
-    
-    # Activate base Conda environment
-    print("🔄 Initializing Conda...")
-    run_command("conda init")
-    
-    # Create Osdag environment
-    print(f"🛠️ Creating Conda environment: {env_name}...")
-    run_command(f"conda create -n {env_name} python=3.8 -y")
-    
-    # Install Osdag
-    print("📦 Installing Osdag...")
-    run_command(f"conda install -n {env_name} -c whdlgp osdag -y")
-    
-    print("✅ Osdag installation complete!")
+    """Create and set up a Conda environment for Osdag."""
+    print(f"Setting up Conda environment '{ENV_NAME}'...")
+    run_command(f"{CONDA_PATH} create -n {ENV_NAME} -c conda-forge osdag -y")
+    print(f"Conda environment '{ENV_NAME}' created successfully.")
 
 def launch_osdag():
-    """Launch Osdag from the Conda environment."""
-    env_name = "osdag_env"
-    print(f"🚀 Launching Osdag from Conda environment {env_name}...")
-    os.system(f'cmd.exe /K "conda activate {env_name} & osdag"')
+    """Activate Conda environment and launch Osdag."""
+    print("Launching Osdag...")
+    run_command(f"{CONDA_PATH} run -n {ENV_NAME} osdag")
+    print("Osdag launched successfully!")
 
 if __name__ == "__main__":
-    if not check_conda():
-        install_miniconda()
-    setup_conda_env()
+    if not CONDA_PATH:
+        print("Conda is not installed. Please install Miniconda first.")
+        sys.exit(1)
+    
+    if not os.path.exists(os.path.expanduser(f"~/.conda/envs/{ENV_NAME}")):
+        setup_conda_env()
+    
     launch_osdag()
-
 
