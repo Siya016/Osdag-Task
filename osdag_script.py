@@ -674,39 +674,95 @@
 #     except Exception as e:
 #         print(f"An unexpected error occurred: {e}")
 #         sys.exit(1)
+# import os
+# import subprocess
+# import sys
+# import shutil
+
+# CONDA_PATH = shutil.which("conda")
+# ENV_NAME = "osdag-env"
+
+# def run_command(command, shell=True):
+#     """Run a shell command and exit if it fails."""
+#     result = subprocess.run(command, shell=shell, text=True, capture_output=True)
+#     if result.returncode != 0:
+#         print(f"Error: {result.stderr}")
+#         sys.exit(1)
+#     return result.stdout.strip()
+
+# def setup_conda_env():
+#     """Create and set up a Conda environment for Osdag."""
+#     print(f"Setting up Conda environment '{ENV_NAME}'...")
+#     run_command(f"{CONDA_PATH} create -n {ENV_NAME} -c conda-forge osdag -y")
+#     print(f"Conda environment '{ENV_NAME}' created successfully.")
+
+# def launch_osdag():
+#     """Activate Conda environment and launch Osdag."""
+#     print("Launching Osdag...")
+#     run_command(f"{CONDA_PATH} run -n {ENV_NAME} osdag")
+#     print("Osdag launched successfully!")
+
+# if __name__ == "__main__":
+#     if not CONDA_PATH:
+#         print("Conda is not installed. Please install Miniconda first.")
+#         sys.exit(1)
+    
+#     if not os.path.exists(os.path.expanduser(f"~/.conda/envs/{ENV_NAME}")):
+#         setup_conda_env()
+    
+#     launch_osdag()
 import os
 import subprocess
 import sys
 import shutil
 
-CONDA_PATH = shutil.which("conda")
 ENV_NAME = "osdag-env"
 
-def run_command(command, shell=True):
-    """Run a shell command and exit if it fails."""
-    result = subprocess.run(command, shell=shell, text=True, capture_output=True)
+def find_conda():
+    """Find Conda installation path."""
+    conda_exe = shutil.which("conda")
+    
+    # If not found, check common install locations
+    if not conda_exe:
+        possible_paths = [
+            os.path.expanduser("~/Miniconda3/Scripts/conda.exe"),
+            os.path.expanduser("~/Anaconda3/Scripts/conda.exe"),
+            "C:\\Miniconda3\\Scripts\\conda.exe",
+            "C:\\Anaconda3\\Scripts\\conda.exe"
+        ]
+        for path in possible_paths:
+            if os.path.exists(path):
+                return path
+    
+    if not conda_exe:
+        print("❌ Conda is not installed. Please install Miniconda first.")
+        sys.exit(1)
+    
+    return conda_exe
+
+CONDA_PATH = find_conda()
+
+def run_command(command):
+    """Run a command and exit on failure."""
+    result = subprocess.run(command, shell=True, text=True, capture_output=True)
     if result.returncode != 0:
-        print(f"Error: {result.stderr}")
+        print(f"❌ Error: {result.stderr}")
         sys.exit(1)
     return result.stdout.strip()
 
 def setup_conda_env():
     """Create and set up a Conda environment for Osdag."""
-    print(f"Setting up Conda environment '{ENV_NAME}'...")
-    run_command(f"{CONDA_PATH} create -n {ENV_NAME} -c conda-forge osdag -y")
-    print(f"Conda environment '{ENV_NAME}' created successfully.")
+    print(f"🔧 Setting up Conda environment '{ENV_NAME}'...")
+    run_command(f'"{CONDA_PATH}" create -n {ENV_NAME} -c conda-forge osdag -y')
+    print(f"✅ Conda environment '{ENV_NAME}' created successfully.")
 
 def launch_osdag():
     """Activate Conda environment and launch Osdag."""
-    print("Launching Osdag...")
-    run_command(f"{CONDA_PATH} run -n {ENV_NAME} osdag")
-    print("Osdag launched successfully!")
+    print("🚀 Launching Osdag...")
+    run_command(f'"{CONDA_PATH}" run -n {ENV_NAME} osdag')
+    print("✅ Osdag launched successfully!")
 
 if __name__ == "__main__":
-    if not CONDA_PATH:
-        print("Conda is not installed. Please install Miniconda first.")
-        sys.exit(1)
-    
     if not os.path.exists(os.path.expanduser(f"~/.conda/envs/{ENV_NAME}")):
         setup_conda_env()
     
