@@ -26,7 +26,7 @@ jobs:
         run: pip install pyinstaller
 
       - name: Build Executable
-        run: pyinstaller --onefile  --hidden-import=encodings --add-data "C:\Program Files\Python38\Lib\encodings;encodings"   osdag_script.py
+        run: pyinstaller --onefile  --hidden-import=encodings  osdag_script.py
 
       - name: List Files in Dist Directory
         run: dir dist
