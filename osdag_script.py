@@ -711,58 +711,155 @@
 #         setup_conda_env()
     
 #     launch_osdag()
+# import os
+# import subprocess
+# import sys
+# import urllib.request
+
+# # Miniconda URL
+# MINICONDA_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe"
+# INSTALLER_PATH = os.path.join(os.getcwd(), "MinicondaInstaller.exe")
+
+# def is_conda_installed():
+#     """Check if Conda is installed."""
+#     try:
+#         subprocess.run(["conda", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+#         return True
+#     except FileNotFoundError:
+#         return False
+
+# def download_miniconda():
+#     """Download Miniconda installer."""
+#     print("[INFO] Downloading Miniconda...")
+#     urllib.request.urlretrieve(MINICONDA_URL, INSTALLER_PATH)
+#     print("[INFO] Download complete.")
+
+# def install_miniconda():
+#     """Run Miniconda installer silently."""
+#     print("[INFO] Installing Miniconda (this may take a few minutes)...")
+#     subprocess.run([INSTALLER_PATH, "/S", "/InstallationType=JustMe"], check=True)
+#     print("[INFO] Miniconda installed successfully.")
+
+# def create_conda_env():
+#     """Create a Conda environment and install Osdag."""
+#     print("[INFO] Creating Conda environment: osdag-env")
+#     subprocess.run(["conda", "create", "-n", "osdag-env", "-y", "-c", "conda-forge", "osdag"], check=True)
+#     print("[INFO] Conda environment created.")
+
+# def launch_osdag():
+#     """Launch Osdag."""
+#     print("[INFO] Launching Osdag...")
+#     subprocess.run(["conda", "run", "-n", "osdag-env", "python", "-m", "osdag"], check=True)
+
+# def main():
+#     try:
+#         if not is_conda_installed():
+#             download_miniconda()
+#             install_miniconda()
+
+#         create_conda_env()
+#         launch_osdag()
+    
+#     except Exception as e:
+#         print(f"[ERROR] {e}")
+
+# if __name__ == "__main__":
+#     main()
+
 import os
 import subprocess
 import sys
-import urllib.request
+import requests
+import shutil
 
-# Miniconda URL
-MINICONDA_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe"
-INSTALLER_PATH = os.path.join(os.getcwd(), "MinicondaInstaller.exe")
+def download_file(url, output_path):
+    """Download a file from a given URL and save it locally."""
+    print(f"Downloading: {url}")
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        with open(output_path, "wb") as file:
+            for chunk in response.iter_content(1024):
+                file.write(chunk)
+        print(f"Downloaded successfully: {output_path}")
+    else:
+        print(f"Failed to download: {url}")
+        sys.exit(1)
 
 def is_conda_installed():
-    """Check if Conda is installed."""
+    """Check if Miniconda is installed."""
     try:
         subprocess.run(["conda", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         return True
     except FileNotFoundError:
         return False
 
-def download_miniconda():
-    """Download Miniconda installer."""
-    print("[INFO] Downloading Miniconda...")
-    urllib.request.urlretrieve(MINICONDA_URL, INSTALLER_PATH)
-    print("[INFO] Download complete.")
-
 def install_miniconda():
-    """Run Miniconda installer silently."""
-    print("[INFO] Installing Miniconda (this may take a few minutes)...")
-    subprocess.run([INSTALLER_PATH, "/S", "/InstallationType=JustMe"], check=True)
-    print("[INFO] Miniconda installed successfully.")
+    """Download and install Miniconda."""
+    miniconda_installer = "Miniconda3-latest-Windows-x86_64.exe"
+    miniconda_url = "https://repo.anaconda.com/miniconda/" + miniconda_installer
+    output_path = os.path.join(os.getcwd(), miniconda_installer)
+
+    download_file(miniconda_url, output_path)
+
+    print("Installing Miniconda...")
+    subprocess.run([output_path, "/S", "/InstallationType=JustMe", "/RegisterPython=0", "/AddToPath=0"], check=True)
+
+    conda_path = os.path.expanduser("~/Miniconda3/Scripts/conda.exe")
+    if os.path.exists(conda_path):
+        print("Miniconda installed successfully.")
+    else:
+        print("Miniconda installation failed.")
+        sys.exit(1)
+
+def install_miktex():
+    """Download and install MiKTeX."""
+    miktex_installer = "miktexsetup.exe"
+    miktex_url = "https://miktex.org/download/win/miktexsetup.exe"
+    output_path = os.path.join(os.getcwd(), miktex_installer)
+
+    download_file(miktex_url, output_path)
+
+    print("Installing MiKTeX...")
+    subprocess.run([output_path, "/silent"], check=True)
+    print("MiKTeX installed successfully.")
+
+def install_latex_packages():
+    """Install required LaTeX packages for Osdag."""
+    latex_packages = [
+        "geometry",
+        "graphicx",
+        "amsmath",
+        "hyperref"
+    ]
+    print("Installing LaTeX packages...")
+
+    for package in latex_packages:
+        try:
+            subprocess.run(["mpm", "--install", package], check=True)
+        except subprocess.CalledProcessError:
+            print(f"Failed to install LaTeX package: {package}")
+
+    print("LaTeX packages installed successfully.")
 
 def create_conda_env():
-    """Create a Conda environment and install Osdag."""
-    print("[INFO] Creating Conda environment: osdag-env")
-    subprocess.run(["conda", "create", "-n", "osdag-env", "-y", "-c", "conda-forge", "osdag"], check=True)
-    print("[INFO] Conda environment created.")
+    """Create Conda environment and install Osdag."""
+    print("Creating Conda environment for Osdag...")
+    subprocess.run(["conda", "create", "-n", "osdag-env", "osdag::osdag", "-c", "conda-forge", "-y"], check=True)
+    print("Conda environment created successfully.")
 
 def launch_osdag():
     """Launch Osdag."""
-    print("[INFO] Launching Osdag...")
-    subprocess.run(["conda", "run", "-n", "osdag-env", "python", "-m", "osdag"], check=True)
+    print("Activating Osdag environment...")
+    os.system("conda activate osdag-env && python -m osdag")
 
 def main():
-    try:
-        if not is_conda_installed():
-            download_miniconda()
-            install_miniconda()
+    if not is_conda_installed():
+        install_miniconda()
 
-        create_conda_env()
-        launch_osdag()
-    
-    except Exception as e:
-        print(f"[ERROR] {e}")
+    install_miktex()
+    install_latex_packages()
+    create_conda_env()
+    launch_osdag()
 
 if __name__ == "__main__":
     main()
-
