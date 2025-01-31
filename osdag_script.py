@@ -715,59 +715,54 @@ import os
 import subprocess
 import sys
 import urllib.request
-import shutil
 
+# Miniconda URL
 MINICONDA_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe"
-MINICONDA_INSTALLER = "Miniconda3-latest-Windows-x86_64.exe"
-ENV_NAME = "osdag-env"
-OSDAG_PACKAGE = "osdag"
+INSTALLER_PATH = os.path.join(os.getcwd(), "MinicondaInstaller.exe")
 
 def is_conda_installed():
     """Check if Conda is installed."""
     try:
         subprocess.run(["conda", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         return True
-    except subprocess.CalledProcessError:
+    except FileNotFoundError:
         return False
 
 def download_miniconda():
     """Download Miniconda installer."""
-    print("⬇️ Downloading Miniconda...")
-    urllib.request.urlretrieve(MINICONDA_URL, MINICONDA_INSTALLER)
-    print("✅ Miniconda downloaded successfully.")
+    print("[INFO] Downloading Miniconda...")
+    urllib.request.urlretrieve(MINICONDA_URL, INSTALLER_PATH)
+    print("[INFO] Download complete.")
 
 def install_miniconda():
-    """Install Miniconda silently."""
-    print("⚙️ Installing Miniconda...")
-    subprocess.run([MINICONDA_INSTALLER, "/InstallationType=JustMe", "/AddToPath=1", "/S"], check=True)
-    print("✅ Miniconda installed successfully.")
+    """Run Miniconda installer silently."""
+    print("[INFO] Installing Miniconda (this may take a few minutes)...")
+    subprocess.run([INSTALLER_PATH, "/S", "/InstallationType=JustMe"], check=True)
+    print("[INFO] Miniconda installed successfully.")
 
 def create_conda_env():
-    """Create Conda environment and install Osdag."""
-    print(f"🔧 Creating Conda environment '{ENV_NAME}' and installing Osdag...")
-    subprocess.run(["conda", "create", "-n", ENV_NAME, "-c", "conda-forge", OSDAG_PACKAGE, "python=3.8", "-y"], check=True)
-    print(f"✅ Conda environment '{ENV_NAME}' with Osdag installed successfully.")
+    """Create a Conda environment and install Osdag."""
+    print("[INFO] Creating Conda environment: osdag-env")
+    subprocess.run(["conda", "create", "-n", "osdag-env", "-y", "-c", "conda-forge", "osdag"], check=True)
+    print("[INFO] Conda environment created.")
 
 def launch_osdag():
-    """Activate environment and launch Osdag."""
-    print("🚀 Launching Osdag...")
-    subprocess.run(f'conda run -n {ENV_NAME} osdag', shell=True, check=True)
+    """Launch Osdag."""
+    print("[INFO] Launching Osdag...")
+    subprocess.run(["conda", "run", "-n", "osdag-env", "python", "-m", "osdag"], check=True)
 
 def main():
-    # Step 1: Ensure Miniconda is installed
-    if not is_conda_installed():
-        download_miniconda()
-        install_miniconda()
+    try:
+        if not is_conda_installed():
+            download_miniconda()
+            install_miniconda()
 
-    # Step 2: Set up Conda environment with Osdag
-    create_conda_env()
-
-    # Step 3: Launch Osdag
-    launch_osdag()
+        create_conda_env()
+        launch_osdag()
+    
+    except Exception as e:
+        print(f"[ERROR] {e}")
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        sys.exit(1)
+    main()
+
