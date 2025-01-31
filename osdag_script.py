@@ -774,7 +774,7 @@ import shutil
 
 # Miniconda and MiKTeX URLs
 MINICONDA_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe"
-MIKTEX_URL = "https://github.com/MiKTeX/miktex/releases/download/4.0.0/miktex-setup-4.0.0-x64.exe"
+MIKTEX_URL = "https://miktex.org/download/ctan/systems/win32/miktex/setup/miktex-setup-4.0.0-x64.exe"
 
 # Installer paths
 INSTALLER_PATH = os.path.join(os.getcwd(), "MinicondaInstaller.exe")
