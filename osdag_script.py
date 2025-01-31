@@ -769,7 +769,7 @@
 import os
 import subprocess
 import sys
-import requests
+import urllib.request
 import shutil
 
 def download_file(url, output_path):
