@@ -716,6 +716,11 @@ import subprocess
 import sys
 import time
 import shutil
+import io
+
+# Set UTF-8 encoding to fix UnicodeEncodeError
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 # Miniconda Download URL
 MINICONDA_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe"
