@@ -766,117 +766,197 @@
 # if __name__ == "__main__":
 #     main()
 
+# import os
+# import subprocess
+# import sys
+# import urllib.request
+# import shutil
+
+# # Miniconda and MiKTeX URLs
+# MINICONDA_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe"
+# MIKTEX_URL = "https://miktex.org/download/ctan/systems/win32/miktex/setup/miktex-setup-4.0.0-x64.exe"
+
+# # Installer paths
+# INSTALLER_PATH = os.path.join(os.getcwd(), "MinicondaInstaller.exe")
+# MIKTEX_INSTALLER_PATH = os.path.join(os.getcwd(), "MiKTeXInstaller.exe")
+
+# # Environment name for Osdag
+# ENV_NAME = "osdag-env"
+
+# # Function to run shell commands and exit if it fails
+# def run_command(command, shell=True):
+#     """Run a shell command and exit if it fails."""
+#     result = subprocess.run(command, shell=shell, text=True, capture_output=True)
+#     if result.returncode != 0:
+#         print(f"Error: {result.stderr}")
+#         sys.exit(1)
+#     return result.stdout.strip()
+
+# # Function to check if Conda is installed
+# def is_conda_installed():
+#     """Check if Conda is installed."""
+#     try:
+#         subprocess.run(["conda", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+#         return True
+#     except FileNotFoundError:
+#         return False
+
+# # Function to check if MiKTeX is installed
+# def is_miktex_installed():
+#     """Check if MiKTeX is installed."""
+#     try:
+#         subprocess.run(["miktex-console", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+#         return True
+#     except FileNotFoundError:
+#         return False
+
+# # Function to download Miniconda installer
+# def download_miniconda():
+#     """Download Miniconda installer."""
+#     print("[INFO] Downloading Miniconda...")
+#     urllib.request.urlretrieve(MINICONDA_URL, INSTALLER_PATH)
+#     print("[INFO] Download complete.")
+
+# # Function to download MiKTeX installer
+# def download_miktex():
+#     """Download MiKTeX installer."""
+#     print("[INFO] Downloading MiKTeX...")
+#     urllib.request.urlretrieve(MIKTEX_URL, MIKTEX_INSTALLER_PATH)
+#     print("[INFO] Download complete.")
+
+# # Function to install Miniconda
+# def install_miniconda():
+#     """Run Miniconda installer silently."""
+#     print("[INFO] Installing Miniconda (this may take a few minutes)...")
+#     subprocess.run([INSTALLER_PATH, "/S", "/InstallationType=JustMe"], check=True)
+#     print("[INFO] Miniconda installed successfully.")
+
+# # Function to install MiKTeX
+# def install_miktex():
+#     """Run MiKTeX installer silently."""
+#     print("[INFO] Installing MiKTeX (this may take a few minutes)...")
+#     subprocess.run([MIKTEX_INSTALLER_PATH, "/VERYSILENT", "/NORESTART"], check=True)
+#     print("[INFO] MiKTeX installed successfully.")
+
+# # Function to create Conda environment for Osdag
+# def create_conda_env():
+#     """Create a Conda environment and install Osdag."""
+#     print(f"[INFO] Creating Conda environment: {ENV_NAME}")
+#     subprocess.run(["conda", "create", "-n", ENV_NAME, "-y", "-c", "conda-forge", "osdag"], check=True)
+#     print(f"[INFO] Conda environment '{ENV_NAME}' created successfully.")
+
+# # Function to launch Osdag
+# def launch_osdag():
+#     """Activate Conda environment and launch Osdag."""
+#     print(f"[INFO] Launching Osdag in environment: {ENV_NAME}...")
+#     subprocess.run(["conda", "run", "-n", ENV_NAME, "python", "-m", "osdag"], check=True)
+#     print("[INFO] Osdag launched successfully!")
+
+# # Main function that runs the setup and launch processes
+# def main():
+#     try:
+#         # Check if Conda is installed
+#         if not is_conda_installed():
+#             print("[INFO] Conda is not installed. Downloading and installing Miniconda...")
+#             download_miniconda()
+#             install_miniconda()
+
+#         # Check if MiKTeX is installed
+#         if not is_miktex_installed():
+#             print("[INFO] MiKTeX is not installed. Downloading and installing MiKTeX...")
+#             download_miktex()
+#             install_miktex()
+
+#         # Check if the Conda environment exists
+#         if not os.path.exists(os.path.expanduser(f"~/.conda/envs/{ENV_NAME}")):
+#             create_conda_env()
+
+#         # Launch Osdag
+#         launch_osdag()
+    
+#     except Exception as e:
+#         print(f"[ERROR] {e}")
+
+# # Execute the script
+# if __name__ == "__main__":
+#     main()
+
 import os
 import subprocess
 import sys
 import urllib.request
 import shutil
 
-# Miniconda and MiKTeX URLs
+# URLs for Miniconda and MiKTeX
 MINICONDA_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe"
-MIKTEX_URL = "https://miktex.org/download/ctan/systems/win32/miktex/setup/miktex-setup-4.0.0-x64.exe"
+MIKTEX_URL = "https://miktex.org/download/installer/x64"  # Update to the correct MiKTeX download URL
 
-# Installer paths
-INSTALLER_PATH = os.path.join(os.getcwd(), "MinicondaInstaller.exe")
+# File paths
+MINICONDA_INSTALLER_PATH = os.path.join(os.getcwd(), "MinicondaInstaller.exe")
 MIKTEX_INSTALLER_PATH = os.path.join(os.getcwd(), "MiKTeXInstaller.exe")
 
-# Environment name for Osdag
-ENV_NAME = "osdag-env"
-
-# Function to run shell commands and exit if it fails
-def run_command(command, shell=True):
-    """Run a shell command and exit if it fails."""
-    result = subprocess.run(command, shell=shell, text=True, capture_output=True)
-    if result.returncode != 0:
-        print(f"Error: {result.stderr}")
-        sys.exit(1)
-    return result.stdout.strip()
-
-# Function to check if Conda is installed
+# Check if Conda is installed
 def is_conda_installed():
-    """Check if Conda is installed."""
     try:
         subprocess.run(["conda", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         return True
     except FileNotFoundError:
         return False
 
-# Function to check if MiKTeX is installed
-def is_miktex_installed():
-    """Check if MiKTeX is installed."""
-    try:
-        subprocess.run(["miktex-console", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        return True
-    except FileNotFoundError:
-        return False
-
-# Function to download Miniconda installer
-def download_miniconda():
-    """Download Miniconda installer."""
-    print("[INFO] Downloading Miniconda...")
-    urllib.request.urlretrieve(MINICONDA_URL, INSTALLER_PATH)
+# Download file
+def download_file(url, output_path):
+    print(f"[INFO] Downloading {url}...")
+    urllib.request.urlretrieve(url, output_path)
     print("[INFO] Download complete.")
 
-# Function to download MiKTeX installer
-def download_miktex():
-    """Download MiKTeX installer."""
-    print("[INFO] Downloading MiKTeX...")
-    urllib.request.urlretrieve(MIKTEX_URL, MIKTEX_INSTALLER_PATH)
-    print("[INFO] Download complete.")
-
-# Function to install Miniconda
+# Install Miniconda
 def install_miniconda():
-    """Run Miniconda installer silently."""
     print("[INFO] Installing Miniconda (this may take a few minutes)...")
-    subprocess.run([INSTALLER_PATH, "/S", "/InstallationType=JustMe"], check=True)
+    subprocess.run([MINICONDA_INSTALLER_PATH, "/S", "/InstallationType=JustMe"], check=True)
     print("[INFO] Miniconda installed successfully.")
 
-# Function to install MiKTeX
+# Install MiKTeX
 def install_miktex():
-    """Run MiKTeX installer silently."""
     print("[INFO] Installing MiKTeX (this may take a few minutes)...")
-    subprocess.run([MIKTEX_INSTALLER_PATH, "/VERYSILENT", "/NORESTART"], check=True)
+    subprocess.run([MIKTEX_INSTALLER_PATH, "/S"], check=True)
     print("[INFO] MiKTeX installed successfully.")
 
-# Function to create Conda environment for Osdag
+# Create Conda environment and install Osdag
 def create_conda_env():
-    """Create a Conda environment and install Osdag."""
-    print(f"[INFO] Creating Conda environment: {ENV_NAME}")
-    subprocess.run(["conda", "create", "-n", ENV_NAME, "-y", "-c", "conda-forge", "osdag"], check=True)
-    print(f"[INFO] Conda environment '{ENV_NAME}' created successfully.")
+    print("[INFO] Creating Conda environment: osdag-env")
+    subprocess.run(["conda", "create", "-n", "osdag-env", "-y", "-c", "conda-forge", "osdag"], check=True)
+    print("[INFO] Conda environment created.")
 
-# Function to launch Osdag
+# Launch Osdag
 def launch_osdag():
-    """Activate Conda environment and launch Osdag."""
-    print(f"[INFO] Launching Osdag in environment: {ENV_NAME}...")
-    subprocess.run(["conda", "run", "-n", ENV_NAME, "python", "-m", "osdag"], check=True)
-    print("[INFO] Osdag launched successfully!")
+    print("[INFO] Launching Osdag...")
+    subprocess.run(["conda", "run", "-n", "osdag-env", "python", "-m", "osdag"], check=True)
 
-# Main function that runs the setup and launch processes
+# Main function to check installation and install dependencies
 def main():
     try:
-        # Check if Conda is installed
+        # Step 1: Check if Conda is installed
         if not is_conda_installed():
             print("[INFO] Conda is not installed. Downloading and installing Miniconda...")
-            download_miniconda()
+            download_file(MINICONDA_URL, MINICONDA_INSTALLER_PATH)
             install_miniconda()
 
-        # Check if MiKTeX is installed
-        if not is_miktex_installed():
+        # Step 2: Check if MiKTeX is installed (this example assumes MiKTeX is not installed yet)
+        if not shutil.which("miktex-console"):
             print("[INFO] MiKTeX is not installed. Downloading and installing MiKTeX...")
-            download_miktex()
+            download_file(MIKTEX_URL, MIKTEX_INSTALLER_PATH)
             install_miktex()
 
-        # Check if the Conda environment exists
-        if not os.path.exists(os.path.expanduser(f"~/.conda/envs/{ENV_NAME}")):
-            create_conda_env()
+        # Step 3: Create Conda environment and install Osdag
+        create_conda_env()
 
-        # Launch Osdag
+        # Step 4: Launch Osdag
         launch_osdag()
-    
+
     except Exception as e:
         print(f"[ERROR] {e}")
 
-# Execute the script
+# Run the script
 if __name__ == "__main__":
     main()
+
